@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserInfoResponse {
     private Long id;
-    private String jwt;
+//    private String jwt;   // not needed, in cookie based auth
     private String username;
     private List<String> roles;
 }
