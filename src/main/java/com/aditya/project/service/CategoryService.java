@@ -1,6 +1,5 @@
 package com.aditya.project.service;
 
-import com.aditya.project.model.Category;
 import com.aditya.project.payload.CategoryDTO;
 import com.aditya.project.payload.CategoryResponse;
 
