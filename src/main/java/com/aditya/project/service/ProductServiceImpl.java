@@ -2,13 +2,18 @@ package com.aditya.project.service;
 
 import com.aditya.project.exception.APIException;
 import com.aditya.project.exception.ResourceNotFoundException;
+import com.aditya.project.model.Cart;
 import com.aditya.project.model.Category;
 import com.aditya.project.model.Product;
+import com.aditya.project.payload.CartDTO;
 import com.aditya.project.payload.ProductDTO;
 import com.aditya.project.payload.ProductResponse;
+import com.aditya.project.repository.CartRepository;
 import com.aditya.project.repository.CategoryRepository;
 import com.aditya.project.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,11 +28,18 @@ import java.util.List;
 @Service
 public class ProductServiceImpl implements ProductService{
 
+    @Autowired
+    private CartRepository cartRepository;
+
+    @Autowired
+    private CartService cartService;
+
     private ProductRepository productRepository;
     private CategoryRepository categoryRepository;
 
     private ModelMapper modelMapper;
     private FileService fileService;
+
 
     @Value("${project.images}")
     private String path;
@@ -155,9 +167,24 @@ public class ProductServiceImpl implements ProductService{
         existingProduct.setSpecialPrice(product.getSpecialPrice());
 
         Product savedProduct = productRepository.save(existingProduct);
+
+        // to reflect changes in cart when product is updated
+        List<Cart> carts = cartRepository.findCartsByProductId(productId);
+
+        List<CartDTO> cartDTOs = carts.stream().map(c -> {
+            CartDTO cartDTO = modelMapper.map(c, CartDTO.class);
+            List<ProductDTO> productDTOs = c.getCartItems().stream()
+                    .map(ci -> modelMapper.map(ci.getProduct(), ProductDTO.class)).toList();
+            cartDTO.setProducts(productDTOs);
+            return cartDTO;
+        }).toList();
+
+        cartDTOs.forEach(cart -> cartService.updateProductInCart(cart.getCartId(), productId));
+
         return modelMapper.map(savedProduct, ProductDTO.class);
     }
 
+    @Transactional
     @Override
     public ProductDTO deleteProduct(Long productId) {
         Product productToDelete = productRepository.findById(productId)

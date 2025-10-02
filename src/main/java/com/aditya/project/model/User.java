@@ -66,6 +66,10 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "address_id"))
     private List<Address> addresses = new ArrayList<>();
 
+    @ToString.Exclude
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Cart cart;
+
     // user can be a seller
     @ToString.Exclude
     @OneToMany(mappedBy = "user",
