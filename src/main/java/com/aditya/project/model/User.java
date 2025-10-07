@@ -9,10 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @NoArgsConstructor
@@ -64,7 +61,7 @@ public class User {
     @JoinTable(name = "user_address",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "address_id"))
-    private List<Address> addresses = new ArrayList<>();
+    private Set<Address> addresses = new HashSet<>();
 
     @ToString.Exclude
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -77,4 +74,8 @@ public class User {
             orphanRemoval = true)
     private Set<Product> products;
 
+    @Override
+    public int hashCode(){
+        return Objects.hash(userId);
+    }
 }

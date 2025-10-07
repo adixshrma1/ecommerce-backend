@@ -1,23 +1,15 @@
-package com.aditya.project.model;
+package com.aditya.project.payload;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-import java.util.*;
-
-@Entity
-@Table(name = "addresses")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Address {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class AddressDTO {
     private Long addressId;
 
     @NotBlank
@@ -44,21 +36,4 @@ public class Address {
     @Size(min = 5, message = "pincode must be 5 or more characters long")
     private String pincode;
 
-    @ToString.Exclude
-    @ManyToMany(mappedBy = "addresses")
-    private Set<User> users = new HashSet<>();
-
-    public Address(String street, String building, String city, String state, String country, String pincode) {
-        this.street = street;
-        this.building = building;
-        this.city = city;
-        this.state = state;
-        this.country = country;
-        this.pincode = pincode;
-    }
-
-    @Override
-    public int hashCode(){
-        return Objects.hash(addressId);
-    }
 }
