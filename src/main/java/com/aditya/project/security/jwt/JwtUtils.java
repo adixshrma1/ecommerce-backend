@@ -35,6 +35,14 @@ public class JwtUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
+    public String getJwtFromHeader(HttpServletRequest request){
+        String bearerToken = request.getHeader("Authorization");
+        if(bearerToken != null && bearerToken.startsWith("Bearer ")){
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+
     public String getJwtFromCookies(HttpServletRequest request){
         Cookie cookie = WebUtils.getCookie(request, jwtCookie);
         if(cookie != null) {
